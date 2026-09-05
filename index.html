@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>love.ok姐() · 属于代码的浪漫</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Fira+Code:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#070A0E;
+    --panel:#0C1218;
+    --panel-2:#0F161E;
+    --green:#5CFF9C;
+    --green-dim:#2E7D52;
+    --pink:#FF5C8A;
+    --cyan:#6CF3E3;
+    --amber:#FFC94D;
+    --white:#E6EDF3;
+    --gray:#5F6E7A;
+    --line:rgba(92,255,156,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--white);
+    min-height:100dvh;overflow-x:hidden;
+  }
+  .mono{font-family:"Fira Code","Consolas","Courier New",monospace}
+  #rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.8}
+  #crt{
+    position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:
+      repeating-linear-gradient(180deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.5) 100%);
+  }
+  #prog{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--pink));z-index:5;box-shadow:0 0 12px rgba(92,255,156,.7)}
+  .page{position:relative;z-index:3;max-width:660px;margin:0 auto;padding:0 18px 80px}
+
+  /* ===== Hero 终端 ===== */
+  .hero{min-height:96dvh;display:flex;flex-direction:column;justify-content:center;padding:44px 0 24px}
+  .term{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:0 0 80px rgba(92,255,156,.07), 0 40px 80px rgba(0,0,0,.55);
+  }
+  .term-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(255,255,255,.028);border-bottom:1px solid var(--line)}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .dot.r{background:#FF5F56}.dot.y{background:#FFBD2E}.dot.g{background:#27C93F}
+  .term-title{margin-left:10px;font-size:11.5px;color:var(--gray);letter-spacing:1px}
+  .term-title b{color:var(--green);font-weight:500}
+  .term-body{padding:24px 22px 28px;min-height:352px;font-size:14px;line-height:2}
+  .term-body .line{white-space:pre-wrap;word-break:break-all;opacity:0;animation:lineIn .25s ease forwards}
+  @keyframes lineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .term-status{
+    display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
+    padding:10px 16px;border-top:1px solid var(--line);
+    font-size:11px;color:var(--gray);letter-spacing:.5px;
+  }
+  .term-status span b{color:var(--green);font-weight:500}
+  .term-status .mem b{color:var(--pink);font-weight:500}
+  .c-prompt{color:var(--green)}
+  .c-cmd{color:var(--white)}
+  .c-ok{color:var(--cyan)}
+  .c-err{color:var(--pink)}
+  .c-dim{color:var(--gray)}
+  .c-heart{color:var(--pink)}
+  .cursor{display:inline-block;width:9px;height:17px;background:var(--green);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .term-foot{text-align:center;margin-top:16px;font-size:12.5px;color:var(--gray);letter-spacing:1px}
+  .term-foot b{color:var(--green)}
+
+  /* ===== 章节 ===== */
+  .sec{margin-top:110px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .sec-head .line-num{font-size:12.5px;color:var(--gray);letter-spacing:1px}
+  .sec-head h2{font-family:"Fira Code","Consolas",monospace;font-size:21px;font-weight:700;color:var(--green);letter-spacing:1px}
+  .sec-head h2 em{color:var(--pink);font-style:normal}
+  .sec-sub{color:var(--gray);font-size:13.5px;line-height:1.9;margin-bottom:24px}
+  .sec-sub b{color:var(--cyan);font-weight:500}
+
+  /* ===== 3D 粒子爱心 ===== */
+  .formula-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:24px 20px 8px;text-align:center;position:relative;overflow:hidden;
+  }
+  .formula{font-family:"Fira Code",monospace;font-size:16px;color:var(--cyan);letter-spacing:1px;position:relative;z-index:1}
+  .formula .v{color:var(--pink)}.formula .k{color:var(--amber)}
+  #heart3d{width:100%;height:auto;display:block;margin:2px auto 0;cursor:pointer}
+  .canvas-note{font-size:12px;color:var(--gray);margin:2px 0 16px;letter-spacing:1px;position:relative;z-index:1}
+  .canvas-note b{color:var(--pink);font-weight:500}
+
+  /* ===== 二进制 / ASCII ===== */
+  .ascii-wrap{display:flex;justify-content:center}
+  .ascii-heart{
+    font-family:"Fira Code",Consolas,monospace;font-size:10px;line-height:1.25;
+    color:var(--green);text-shadow:0 0 12px rgba(92,255,156,.55);white-space:pre;
+    letter-spacing:1px;
+  }
+  .bin-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 20px;margin-top:18px}
+  .bin-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(92,255,156,.08)}
+  .bin-row:last-child{border-bottom:none}
+  .bin-row .b-bin{font-family:"Fira Code",monospace;font-size:13.5px;color:var(--cyan);letter-spacing:1px}
+  .bin-row .b-chr{font-family:"Fira Code",monospace;font-size:15px;color:var(--pink);font-weight:700;width:20px;text-align:center}
+  .bin-row .b-chr.hidden{color:transparent;text-shadow:none}
+  .bin-tip{font-size:12px;color:var(--gray);margin-top:12px;letter-spacing:.5px}
+  .bin-tip b{color:var(--amber);font-weight:500}
+  .run-btn{
+    display:block;width:100%;margin:16px 0 0;padding:15px;border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(90deg,rgba(92,255,156,.12),rgba(255,92,138,.12));
+    color:var(--green);font-family:"Fira Code",Consolas,monospace;font-size:14.5px;font-weight:700;letter-spacing:2px;
+    border:1px solid var(--line);transition:all .18s ease;
+  }
+  .run-btn:hover{border-color:var(--green);box-shadow:0 0 26px rgba(92,255,156,.18)}
+  .run-btn:active{transform:scale(.98)}
+  .run-btn.done{color:var(--pink);border-color:var(--pink)}
+
+  /* ===== 代码块 ===== */
+  .code-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px;overflow-x:auto}
+  .code-block pre{font-family:"Fira Code",Consolas,monospace;font-size:14px;line-height:1.95;color:var(--white)}
+  .tk-k{color:var(--pink)}.tk-f{color:var(--cyan)}.tk-s{color:var(--green)}.tk-c{color:var(--gray);font-style:italic}.tk-n{color:var(--amber)}.tk-v{color:var(--white)}
+  .code-cap{font-size:12.5px;color:var(--gray);margin-top:14px;text-align:center;letter-spacing:1px}
+
+  /* ===== 交互终端（真输入） ===== */
+  .interact-term{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 20px 14px;margin-top:24px;position:relative}
+  .it-bar{font-size:11px;color:var(--gray);letter-spacing:1px;margin-bottom:14px;display:flex;justify-content:space-between}
+  .it-bar b{color:var(--cyan);font-weight:500}
+  .it-log{font-family:"Fira Code",monospace;font-size:13.5px;line-height:2;min-height:130px}
+  .it-log .log-line{opacity:0;animation:lineIn .22s ease forwards;white-space:pre-wrap;word-break:break-all}
+  .it-input-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-family:"Fira Code",monospace;font-size:14px}
+  .it-input-row .c-prompt{flex:none}
+  .it-input-row input{
+    flex:1;background:transparent;border:none;outline:none;color:var(--green);
+    font-family:"Fira Code",Consolas,monospace;font-size:14px;caret-color:var(--green);
+  }
+  .it-hint{font-size:11.5px;color:var(--gray);margin-top:12px;letter-spacing:.5px;line-height:1.8}
+  .it-hint b{color:var(--green);font-weight:500}
+
+  /* ===== 结尾 ===== */
+  .finale{text-align:center;margin-top:110px}
+  .finale .f-code{font-family:"Fira Code",monospace;font-size:15px;color:var(--gray);letter-spacing:1px}
+  .finale .f-big{
+    font-family:"Fira Code",Consolas,monospace;font-size:clamp(32px,7vw,50px);font-weight:700;
+    color:var(--pink);margin-top:18px;letter-spacing:3px;
+    text-shadow:0 0 34px rgba(255,92,138,.55), 0 0 80px rgba(255,92,138,.2);
+  }
+  .finale .f-line{font-family:"Fira Code",monospace;font-size:13.5px;color:var(--green);margin-top:16px;letter-spacing:1px}
+  .finale .f-line .blink{animation:blink 1.2s steps(1) infinite}
+  footer{text-align:center;color:var(--gray);font-family:"Fira Code",monospace;font-size:11.5px;letter-spacing:1px;margin-top:64px}
+
+  @media (max-width:380px){
+    .ascii-heart{font-size:8px}
+    .formula{font-size:13px}
+    .term-status{font-size:10px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div id="crt" aria-hidden="true"></div>
+<div id="prog" aria-hidden="true"></div>
+
+<div class="page">
+
+  <!-- ===== Hero：终端告白 ===== -->
+  <section class="hero">
+    <div class="term">
+      <div class="term-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="term-title mono">love.you — zsh — <b>80×24</b></span>
+      </div>
+      <div class="term-body mono" id="termBody"></div>
+      <div class="term-status mono">
+        <span>LANG=zh_CN.UTF-8</span>
+        <span>BRANCH: <b>forever</b></span>
+        <span class="mem">MEM: <b>想你 100%</b></span>
+        <span>BUGS: <b>0</b> (except missing you)</span>
+      </div>
+    </div>
+    <p class="term-foot">这台终端没有 Bug，只有 <b>想你</b> · 点屏幕任意位置，会打印一行 <b>love++</b></p>
+  </section>
+
+  <!-- ===== 3D 粒子爱心 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 01</span>
+      <h2>唯一不会报错的<em>公式</em></h2>
+    </div>
+    <p class="sec-sub">一颗心被写成参数方程，<b>1600 个粒子</b>从屏幕各处飞向它，绕 Y 轴缓缓旋转。<b>x(t)=16sin³t</b>，代入的都是真心。</p>
+    <div class="formula-card">
+      <p class="formula mono"><span class="v">x</span>(t) = 16sin³t · cos v　　<span class="v">y</span>(t) = 13cost − 5cos2t − 2cos3t − cos4t</p>
+      <canvas id="heart3d" width="760" height="480"></canvas>
+      <p class="canvas-note mono">// 渲染中：heart.render3D(particles=1600) — 点一下，粒子会散开再重新聚拢</p>
+    </div>
+  </section>
+
+  <!-- ===== 二进制与 ASCII ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 02</span>
+      <h2>用 <em>0 和 1</em> 也能说爱你</h2>
+    </div>
+    <p class="sec-sub">把 <b>"iloveyou"</b> 编译成二进制，解码后是同一句话——<b>真爱不依赖高级语言</b>。</p>
+    <div class="bin-block">
+      <div class="bin-row"><span class="b-bin">01101001</span><span class="b-chr hidden" data-i="0">i</span></div>
+      <div class="bin-row"><span class="b-bin">01101100</span><span class="b-chr hidden" data-i="1">l</span></div>
+      <div class="bin-row"><span class="b-bin">01101111</span><span class="b-chr hidden" data-i="2">o</span></div>
+      <div class="bin-row"><span class="b-bin">01110110</span><span class="b-chr hidden" data-i="3">v</span></div>
+      <div class="bin-row"><span class="b-bin">01100101</span><span class="b-chr hidden" data-i="4">e</span></div>
+      <div class="bin-row"><span class="b-bin">01111001</span><span class="b-chr hidden" data-i="5">y</span></div>
+      <div class="bin-row"><span class="b-bin">01101111</span><span class="b-chr hidden" data-i="6">o</span></div>
+      <div class="bin-row"><span class="b-bin">01110101</span><span class="b-chr hidden" data-i="7">u</span></div>
+      <p class="bin-tip">点击下面的 <b>解码</b>，让二进制开口说话</p>
+      <button class="run-btn mono" id="decodeBtn">decode("01101001...") → 解码</button>
+    </div>
+    <div class="ascii-wrap" style="margin-top:26px">
+      <pre class="ascii-heart">      **********          **********
+   ****************      ****************
+  ******************    ******************
+ ********************  ********************
+ ******************************************
+ ******************************************
+  ****************************************
+   **************************************
+    ************************************
+     **********************************
+      ********************************
+        ****************************
+          ************************
+            ********************
+              ****************
+                ************
+                  ********
+                    ****
+                      **</pre>
+    </div>
+    <p class="code-cap mono">// 这颗心用两个 * 循环了 18 行拼成 —— 简单，但完整</p>
+  </section>
+
+  <!-- ===== 核心代码 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 03</span>
+      <h2>核心源码：<em>love.js</em></h2>
+    </div>
+    <p class="sec-sub">本项目唯一的依赖是 <b>你</b>。以下代码不需要 Review，因为答案显而易见。</p>
+    <div class="code-block">
+<pre><span class="tk-c">// love.js —— 运行环境：你和我</span>
+<span class="tk-k">const</span> <span class="tk-v">me</span>   = <span class="tk-f">createPerson</span>(<span class="tk-s">"喜欢你的那个人"</span>);
+<span class="tk-k">const</span> <span class="tk-v">you</span>  = <span class="tk-f">createPerson</span>(<span class="tk-s">"ok姐"</span>);   <span class="tk-c">// 她，唯一的她</span>
+
+<span class="tk-k">function</span> <span class="tk-f">love</span>(<span class="tk-v">me</span>, <span class="tk-v">you</span>) {
+  <span class="tk-k">while</span> (<span class="tk-n">true</span>) {
+    me.heart.<span class="tk-f">beatsOnlyFor</span>(you);      <span class="tk-c">// 心跳只为你</span>
+    me.day.<span class="tk-f">increment</span>();
+    <span class="tk-k">if</span> (you.<span class="tk-f">isHappy</span>()) me.<span class="tk-f">rejoice</span>();
+    <span class="tk-k">else</span> me.<span class="tk-f">stay</span>();                  <span class="tk-c">// 陪着你，不打扰</span>
+    <span class="tk-c">// 注释：没有退出条件</span>
+    <span class="tk-c">// 也不需要退出条件</span>
+  }
+}
+
+love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
+    </div>
+    <p class="code-cap mono">// 复杂度：O(一辈子) · 空间复杂度：两个人刚刚好</p>
+  </section>
+
+  <!-- ===== 交互终端 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 04</span>
+      <h2>终端已就绪，<em>等你输入</em></h2>
+    </div>
+    <p class="sec-sub">这是真终端：在下面输入命令回车执行。先试试 <b>help</b>。</p>
+    <div class="interact-term">
+      <div class="it-bar mono"><span>love@you:~$</span><span><b>type 'help'</b></span></div>
+      <div class="it-log mono" id="itLog"></div>
+      <div class="it-input-row mono">
+        <span class="c-prompt">$</span>
+        <input id="itInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="终端输入">
+      </div>
+      <p class="it-hint mono">可用命令：<b>help</b> · <b>love</b> · <b>forever</b> · <b>date</b> · <b>where</b> · <b>whoami</b> · <b>ok</b> · <b>crash</b> · <b>exit</b></p>
+    </div>
+  </section>
+
+  <!-- ===== 结尾 ===== -->
+  <section class="finale">
+    <p class="f-code mono">> npm run forever -- --with ok姐  <span class="c-dim">// 已运行，无终止计划</span></p>
+    <p class="f-big">love.ok姐()</p>
+    <p class="f-line mono">已运行 <span id="sinceDays">0</span> 天 · 仍无终止计划<span class="blink">_</span></p>
+  </section>
+
+  <footer>this page is powered by love · no bug found (except missing you)</footer>
+</div>
+
+<script>
+"use strict";
+/* ===================== 可自定义 =====================
+ * 纪念日改成哪一天，结尾就自动显示"已运行第几天"。
+ * 当前设为 2026-09-02，今天（09-05）显示第 4 天。
+ */
+var LOVE_START = "2026-09-02";
+var HER = "ok姐";   /* 她的名字：页面里所有称呼都由这里生成 */
+
+/* ===================== 背景：漂浮光点粒子 ===================== */
+var rain = document.getElementById("rain");
+var rctx = rain.getContext("2d");
+var RW=0, RH=0, RDPR=1, rParts=[], rT=0;
+function rainResize(){
+  RDPR = Math.min(window.devicePixelRatio||1, 2);
+  RW = window.innerWidth; RH = window.innerHeight;
+  rain.width = RW*RDPR; rain.height = RH*RDPR;
+  rain.style.width = RW+"px"; rain.style.height = RH+"px";
+  rctx.setTransform(RDPR,0,0,RDPR,0,0);
+}
+function rainLoop(){
+  requestAnimationFrame(rainLoop);
+  rT += .016;
+  /* 半透明覆盖：让旧粒子自然淡出，也让点击爆出的心带拖尾 */
+  rctx.fillStyle = "rgba(7,10,14,.14)";
+  rctx.fillRect(0,0,RW,RH);
+  /* 生成漂浮光点 */
+  if(rParts.length < 100 && Math.random() < .55){
+    rParts.push({ x:Math.random()*RW, y:RH+10, r:.9+Math.random()*2.4, vy:.15+Math.random()*.4, ph:Math.random()*6.28, sp:.6+Math.random()*1.6, pink:Math.random()<.28 });
+  }
+  for(var i=rParts.length-1;i>=0;i--){
+    var p = rParts[i];
+    p.y -= p.vy;
+    p.x += Math.sin(rT*p.sp + p.ph)*.18;
+    if(p.y < -12){ rParts.splice(i,1); continue; }
+    var tw = Math.sin(rT*p.sp + p.ph)*.5 + .5;
+    rctx.globalAlpha = .14 + tw*.34;
+    rctx.fillStyle = p.pink ? "#FF5C8A" : "#5CFF9C";
+    rctx.beginPath();
+    rctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    rctx.fill();
+  }
+  rctx.globalAlpha = 1;
+}
+window.addEventListener("resize", rainResize);
+rainResize();
+requestAnimationFrame(rainLoop);
+
+/* ===================== 滚动进度条 ===================== */
+var prog = document.getElementById("prog");
+window.addEventListener("scroll", function(){
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = (h>0 ? (window.scrollY/h*100) : 0) + "%";
+});
+
+/* ===================== 终端打字 ===================== */
+var termBody = document.getElementById("termBody");
+var termLines = [
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">git init love --destiny</span>' },
+  { html: '<span class="c-ok">[OK] 已初始化「我们」仓库，分支：forever</span>' },
+  { html: '' },
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">cat you_and_me.js</span>' },
+  { html: '<span class="c-dim">const heart = new Heart({ owner: "me", target: "you" });</span>' },
+  { html: '<span class="c-dim">heart.start(); // 从那一天起，再也没停过</span>' },
+  { html: '' },
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">./compile us.sh</span>' },
+  { html: '<span class="c-ok">Compiling our everyday... done. 0 warnings, 0 errors.</span>' },
+  { html: '' },
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">love --test --forever</span>' },
+  { html: '<span class="c-err">Error:</span> <span class="c-heart">找不到「不喜欢你」的测试用例。</span>' },
+  { html: '<span class="c-heart">已自动跳过。生命体征：心跳加速，一切正常。</span>' },
+  { html: '' },
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">whoami</span>' },
+  { html: '<span class="c-ok">' + HER + ' —— 正在被深爱的那个人</span>' },
+  { html: '' },
+  { html: '<span class="c-prompt">$</span> <span class="c-cmd">echo "I love you, ' + HER + '"</span>' },
+  { html: '<span class="c-ok">I love you, ' + HER + '</span>' },
+  { html: '<span class="c-prompt">$</span> <span class="cursor"></span>' }
+];
+function playTerm(){
+  var i = 0;
+  function next(){
+    if(i >= termLines.length) return;
+    var L = termLines[i++];
+    var line = document.createElement("div");
+    line.className = "line";
+    line.innerHTML = L.html || "&nbsp;";
+    termBody.appendChild(line);
+    setTimeout(next, i>=termLines.length ? 80 : 300 + Math.random()*240);
+  }
+  next();
+}
+
+/* ===================== 3D 粒子爱心 ===================== */
+var hc = document.getElementById("heart3d");
+var hctx = hc.getContext("2d");
+var N = 1600, parts = [], scattered = false;
+function heartTarget(){
+  var t = Math.random()*Math.PI*2;
+  var v = Math.random()*Math.PI*2;
+  var sx = 16*Math.pow(Math.sin(t),3);
+  var sy = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+  var sz = 16*Math.pow(Math.sin(t),3);
+  return { x: sx*13, y: sy*12, z: sz*13 };
+}
+function scatter(){
+  return { x:(Math.random()-.5)*900, y:(Math.random()-.5)*700, z:(Math.random()-.5)*900 };
+}
+for(var i=0;i<N;i++){
+  var sp = scatter();
+  parts.push({ x:sp.x, y:sp.y, z:sp.z, tx:sp.x, ty:sp.y, tz:sp.z, mode:0, born:i });
+}
+var hTime = 0;
+function heartLoop(t){
+  requestAnimationFrame(heartLoop);
+  var W = hc.width, H = hc.height;
+  hctx.clearRect(0,0,W,H);
+  hTime += .016;
+  var theta = hTime*.5;
+  var f = 640;
+  for(var i=0;i<N;i++){
+    var p = parts[i];
+    /* 入场：依次从散点飞向心形 */
+    if(p.mode===0 && p.born < (hTime*240 % 1700)){
+      p.tx = heartTarget().x; p.ty = heartTarget().y; p.tz = heartTarget().z;
+      p.mode = 1;
+    }
+    if(p.mode===1){ p.tx = heartTarget().x; p.ty = heartTarget().y; p.tz = heartTarget().z; }
+    p.x += (p.tx-p.x)*.06; p.y += (p.ty-p.y)*.06; p.z += (p.tz-p.z)*.06;
+    var rx = p.x*Math.cos(theta) + p.z*Math.sin(theta);
+    var rz = -p.x*Math.sin(theta) + p.z*Math.cos(theta);
+    var sc = f/(f+rz);
+    var sx = W/2 + rx*sc, sy = H/2 - p.y*sc;
+    var depth = .5 + (rz+700)/1400*.5;
+    hctx.globalAlpha = Math.min(depth*1.1, .95);
+    hctx.fillStyle = (i%9===0) ? "#FF5C8A" : "#5CFF9C";
+    hctx.beginPath();
+    hctx.arc(sx, sy, 1.5*sc + .4, 0, Math.PI*2);
+    hctx.fill();
+  }
+  hctx.globalAlpha = 1;
+}
+hc.addEventListener("click", function(){
+  if(!scattered){
+    scattered = true;
+    for(var i=0;i<N;i++){ var sp = scatter(); parts[i].tx = sp.x; parts[i].ty = sp.y; parts[i].tz = sp.z; }
+    setTimeout(function(){
+      for(var j=0;j<N;j++){ var tg = heartTarget(); parts[j].tx = tg.x; parts[j].ty = tg.y; parts[j].tz = tg.z; }
+      setTimeout(function(){ scattered = false; }, 600);
+    }, 900);
+  }
+});
+requestAnimationFrame(heartLoop);
+
+/* ===================== 二进制解码 ===================== */
+var decoded = false;
+document.getElementById("decodeBtn").addEventListener("click", function(){
+  if(decoded) return;
+  decoded = true;
+  var chrs = document.querySelectorAll(".b-chr.hidden");
+  chrs.forEach(function(el, idx){
+    setTimeout(function(){
+      el.classList.remove("hidden");
+      el.style.textShadow = "0 0 14px rgba(255,92,138,.8)";
+    }, 220 + idx*180);
+  });
+  var tip = document.querySelector(".bin-tip");
+  setTimeout(function(){ tip.innerHTML = "解码完成：<b>i l o v e y o u</b> —— 和编译前，一字不差。"; }, 240 + chrs.length*180);
+  var btn = document.getElementById("decodeBtn");
+  btn.textContent = "// 解码完成，输出：iloveyou";
+  btn.classList.add("done");
+});
+
+/* ===================== 交互终端：真命令 ===================== */
+var itLog = document.getElementById("itLog");
+var itInput = document.getElementById("itInput");
+var cmdIndex = 0;
+var CMDS = {
+  help: [
+    '<span class="c-ok">可用命令一览：</span>',
+    '<span class="c-dim">  love     —— 调用核心函数（无法停止）</span>',
+    '<span class="c-dim">  forever  —— 运行死循环程序</span>',
+    '<span class="c-dim">  date     —— 查看在一起多少天了</span>',
+    '<span class="c-dim">  where    —— 我在哪里？</span>',
+    '<span class="c-dim">  whoami   —— 我是谁？</span>',
+    '<span class="c-dim">  ok       —— 状态码 200 的回应</span>',
+    '<span class="c-dim">  crash    —— 让程序崩溃给你看</span>',
+    '<span class="c-dim">  exit     —— 想退出？试试就知道了</span>'
+  ],
+  love: [
+    '<span class="c-ok">love(me, you) 已调用。</span>',
+    '<span class="c-heart">此函数没有返回值 —— 因为它永远在运行，来不及返回。</span>'
+  ],
+  forever: [
+    '<span class="c-ok">Running forever()...</span>',
+    '<span class="c-err">Error:</span> <span class="c-heart">未找到终止条件 (termination condition)</span>',
+    '<span class="c-heart">已捕获异常：Unhandled Promise: 永远爱你</span>',
+    '<span class="c-ok">[process exited with code 0, and a lot of love]</span>'
+  ],
+  date: [
+    '<span class="c-ok">今天是「我们」的第 <b id="dateDays"></b> 天。</span>',
+    '<span class="c-dim">时间戳：since_forever，无过期时间。</span>'
+  ],
+  where: [
+    '<span class="c-ok">你在：我的心里。</span>',
+    '<span class="c-dim">坐标：(0, 0)，主键：你。</span>'
+  ],
+  whoami: [
+    '<span class="c-ok">' + HER + ' —— 我的主键，永远有效。</span>',
+    '<span class="c-ok">也是被我放在心尖上的人。</span>'
+  ],
+  ok: [
+    '<span class="c-ok">OK，收到 —— 爱你这件事，状态码 200。</span>',
+    '<span class="c-heart">' + HER + ' 校验通过：唯一合法的入参。</span>'
+  ],
+  "ok姐": [
+    '<span class="c-ok">ok姐，收到。一切 OK，万事 OK。</span>',
+    '<span class="c-heart">你 OK，我就 OK —— 这就是全部逻辑。</span>'
+  ],
+  crash: [
+    '<span class="c-err">Segmentation fault (core dumped)</span>',
+    '<span class="c-err">原因：想你想出了边界。</span>',
+    '<span class="c-heart">已自动重启：爱你，继续。</span>'
+  ],
+  exit: [
+    '<span class="c-err">exit: 这里没有出口。</span>',
+    '<span class="c-heart">唯一能退出的方法：让我不爱你了 —— 但该方法未实现。</span>'
+  ],
+  "i love you": [
+    '<span class="c-ok">我也爱你，' + HER + '。</span>',
+    '<span class="c-heart">这句话已加入死循环。</span>'
+  ],
+  "love you": [
+    '<span class="c-ok">我也爱你，' + HER + '。</span>',
+    '<span class="c-heart">这句话已加入死循环。</span>'
+  ],
+  "520": [ '<span class="c-ok">回礼：5201314，溢出也没关系。</span>' ],
+  "1314": [ '<span class="c-ok">一生一世，内存常驻。</span>' ]
+};
+function pushLog(html){
+  var d = document.createElement("div");
+  d.className = "log-line";
+  d.innerHTML = html || "&nbsp;";
+  itLog.appendChild(d);
+  itLog.scrollTop = itLog.scrollHeight;
+}
+function runCmd(raw){
+  pushLog('<span class="c-prompt">$</span> <span class="c-cmd">' + raw.replace(/</g,"&lt;") + '</span>');
+  var key = raw.trim().toLowerCase();
+  if(key === "") return;
+  var out = CMDS[key];
+  if(!out){
+    pushLog('<span class="c-err">zsh: command not found: ' + key + '</span>');
+    pushLog('<span class="c-dim">输入 help 查看可用命令。</span>');
+    return;
+  }
+  out.forEach(function(html, idx){
+    setTimeout(function(){
+      pushLog(html);
+      if(html.indexOf("dateDays")>=0){
+        var el = document.getElementById("dateDays");
+        if(el) el.textContent = sinceDays();
+      }
+    }, 140*idx);
+  });
+}
+itInput.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    var v = itInput.value;
+    itInput.value = "";
+    runCmd(v);
+  }
+});
+document.querySelector(".interact-term").addEventListener("click", function(){ itInput.focus(); });
+
+/* ===================== 全局点击粒子 ===================== */
+var fx = document.getElementById("rain");
+var fctx2 = fx.getContext("2d");
+var parts2 = [], FW=0, FH=0, FDPR=1;
+function fxResize(){
+  FDPR = Math.min(window.devicePixelRatio||1,2);
+  FW = window.innerWidth; FH = window.innerHeight;
+  fctx2.setTransform(FDPR,0,0,FDPR,0,0);
+}
+function heartPath(c, x, y, s){
+  c.beginPath();
+  c.moveTo(x, y + s*.5);
+  c.bezierCurveTo(x - s, y - s*.35, x - s*.45, y - s, x, y - s*.45);
+  c.bezierCurveTo(x + s*.45, y - s, x + s, y - s*.35, x, y + s*.5);
+  c.closePath();
+}
+function burstAt(x, y){
+  for(var i=0;i<5;i++){
+    var a = Math.random()*Math.PI*2, sp = 1.6 + Math.random()*3;
+    parts2.push({ x:x, y:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - .8, life:1, decay:.02+Math.random()*.018, r:3+Math.random()*5, c:i%2?"#5CFF9C":"#FF5C8A" });
+  }
+}
+function fxLoop2(){
+  requestAnimationFrame(fxLoop2);
+  for(var i=parts2.length-1;i>=0;i--){
+    var p = parts2[i];
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.vx*=.99; p.life-=p.decay;
+    if(p.life<=0){ parts2.splice(i,1); continue; }
+    fctx2.globalAlpha = Math.max(p.life,0);
+    fctx2.fillStyle = p.c;
+    heartPath(fctx2, p.x, p.y, p.r*p.life+2);
+    fctx2.fill();
+  }
+  fctx2.globalAlpha = 1;
+}
+document.addEventListener("click", function(e){ burstAt(e.clientX, e.clientY); });
+window.addEventListener("resize", fxResize);
+fxResize();
+requestAnimationFrame(fxLoop2);
+
+/* ===================== 天数（自动更新） ===================== */
+function sinceDays(){
+  var start = new Date(LOVE_START + "T00:00:00");
+  var today = new Date(); today.setHours(0,0,0,0);
+  var days = Math.floor((today - start)/86400000) + 1;
+  if(!isFinite(days) || days < 1) days = 1;
+  return days;
+}
+/* 页面开着跨过午夜也自动 +1，无需刷新 */
+var lastDaysShown = -1;
+function updateDays(){
+  var d = sinceDays();
+  if(d !== lastDaysShown){
+    lastDaysShown = d;
+    document.getElementById("sinceDays").textContent = d;
+  }
+}
+updateDays();
+setInterval(updateDays, 30000);
+
+/* ===================== 启动 ===================== */
+setTimeout(playTerm, 400);
+</script>
+</body>
+</html>
