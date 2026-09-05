@@ -418,12 +418,11 @@ function heartLoop(t){
   var f = 640;
   for(var i=0;i<N;i++){
     var p = parts[i];
-    /* 入场：依次从散点飞向心形 */
+    /* 入场：依次从散点飞向心形（目标固定，粒子平滑收敛） */
     if(p.mode===0 && p.born < (hTime*240 % 1700)){
       p.tx = heartTarget().x; p.ty = heartTarget().y; p.tz = heartTarget().z;
       p.mode = 1;
     }
-    if(p.mode===1){ p.tx = heartTarget().x; p.ty = heartTarget().y; p.tz = heartTarget().z; }
     p.x += (p.tx-p.x)*.06; p.y += (p.ty-p.y)*.06; p.z += (p.tz-p.z)*.06;
     var rx = p.x*Math.cos(theta) + p.z*Math.sin(theta);
     var rz = -p.x*Math.sin(theta) + p.z*Math.cos(theta);
@@ -441,9 +440,17 @@ function heartLoop(t){
 hc.addEventListener("click", function(){
   if(!scattered){
     scattered = true;
-    for(var i=0;i<N;i++){ var sp = scatter(); parts[i].tx = sp.x; parts[i].ty = sp.y; parts[i].tz = sp.z; }
+    for(var i=0;i<N;i++){
+      var sp = scatter();
+      parts[i].mode = 2;               /* 散开态：帧循环不再重置目标 */
+      parts[i].tx = sp.x; parts[i].ty = sp.y; parts[i].tz = sp.z;
+    }
     setTimeout(function(){
-      for(var j=0;j<N;j++){ var tg = heartTarget(); parts[j].tx = tg.x; parts[j].ty = tg.y; parts[j].tz = tg.z; }
+      for(var j=0;j<N;j++){
+        var tg = heartTarget();
+        parts[j].mode = 1;             /* 回聚态：飞回心形 */
+        parts[j].tx = tg.x; parts[j].ty = tg.y; parts[j].tz = tg.z;
+      }
       setTimeout(function(){ scattered = false; }, 600);
     }, 900);
   }
