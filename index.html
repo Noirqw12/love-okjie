@@ -605,15 +605,21 @@ function updateDaily(){
 updateDaily();
 setInterval(updateDaily, 30000);
 
-/* ===================== 键盘彩蛋：iloveyou ===================== */
-var keySeq = "", KEY_TARGET = "iloveyou";
+/* ===================== 键盘彩蛋：iloveyou（用物理键码，输入法不干扰） ===================== */
+var keySeq = "";
+var KEY_CODES = ["KeyI","KeyL","KeyO","KeyV","KeyE","KeyY","KeyO","KeyU"];   /* iloveyou 的物理键序 */
 document.addEventListener("keydown", function(e){
   if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
-  keySeq = (keySeq + e.key.toLowerCase()).slice(-KEY_TARGET.length);
-  if(keySeq === KEY_TARGET){
-    rainOn = true;
-    clearTimeout(rainTimer);
-    rainTimer = setTimeout(function(){ rainOn = false; }, 5000);
+  if(e.repeat) return;
+  if(KEY_CODES.indexOf(e.code) >= 0){
+    keySeq = (keySeq + e.code).slice(-8);
+    if(keySeq === "KeyIKeyLKeyOKeyVKeyEKeyYKeyO"){
+      rainOn = true;
+      clearTimeout(rainTimer);
+      rainTimer = setTimeout(function(){ rainOn = false; }, 5000);
+    }
+  } else {
+    keySeq = "";   /* 敲错就重来 */
   }
 });
 
@@ -735,11 +741,15 @@ function heartPath(c, x, y, s){
   c.bezierCurveTo(x + s*.45, y - s, x + s, y - s*.35, x, y + s*.5);
   c.closePath();
 }
+var loveCount = 0;
 function burstAt(x, y){
+  loveCount++;
   for(var i=0;i<5;i++){
     var a = Math.random()*Math.PI*2, sp = 1.6 + Math.random()*3;
     parts2.push({ x:x, y:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - .8, life:1, decay:.02+Math.random()*.018, r:3+Math.random()*5, c:i%2?"#5CFF9C":"#FF5C8A" });
   }
+  /* 真正"打印一行 love++"：向上飘的文字 */
+  parts2.push({ tx:true, x:x, y:y+14, vy:-1.15, life:1, decay:.007, txt:"love++ (" + loveCount + ")" });
 }
 function fxLoop2(){
   requestAnimationFrame(fxLoop2);
@@ -748,6 +758,14 @@ function fxLoop2(){
     p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.vx*=.99; p.life-=p.decay;
     if(p.life<=0){ parts2.splice(i,1); continue; }
     fctx2.globalAlpha = Math.max(p.life,0);
+    if(p.tx){
+      fctx2.font = "bold 15px 'Fira Code',Consolas,monospace";
+      fctx2.fillStyle = "#5CFF9C";
+      fctx2.textAlign = "center";
+      fctx2.fillText(p.txt, p.x, p.y);
+      fctx2.textAlign = "start";
+      continue;
+    }
     fctx2.fillStyle = p.c;
     heartPath(fctx2, p.x, p.y, p.r*p.life+2);
     fctx2.fill();
