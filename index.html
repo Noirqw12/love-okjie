@@ -115,6 +115,27 @@
   .run-btn:active{transform:scale(.98)}
   .run-btn.done{color:var(--pink);border-color:var(--pink)}
 
+  /* ===== 恋爱协议 ===== */
+  .agree-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 22px 20px}
+  .agree-row{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed rgba(92,255,156,.08);font-size:14px;line-height:1.7;color:var(--white)}
+  .agree-row:last-of-type{border-bottom:none}
+  .agree-no{font-family:"Fira Code",Consolas,monospace;color:var(--pink);font-size:12.5px;flex-shrink:0;margin-top:3px}
+  .agree-sign{margin:14px 0 0;font-size:12.5px;color:var(--gray);letter-spacing:1px}
+
+  /* ===== git log ===== */
+  .gitlog{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;font-size:13px;line-height:2}
+  .gitlog p{margin:0;color:var(--gray)}
+  .g-node{color:var(--green)}
+  .g-hash{color:var(--cyan);margin:0 6px}
+  .g-date{color:var(--gray)}
+  .gitlog-foot{margin-top:10px;color:var(--green);font-size:12px}
+
+  /* ===== 每日情话 + 倒计时 ===== */
+  .daily-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;text-align:center}
+  .daily-line{font-size:15px;color:var(--pink);letter-spacing:1px;min-height:26px;text-shadow:0 0 16px rgba(255,92,138,.35)}
+  .daily-meta{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:12px;color:var(--gray);flex-wrap:wrap}
+  .daily-meta b{color:var(--green);font-weight:500}
+
   /* ===== 代码块 ===== */
   .code-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px;overflow-x:auto}
   .code-block pre{font-family:"Fira Code",Consolas,monospace;font-size:14px;line-height:1.95;color:var(--white)}
@@ -286,6 +307,54 @@ love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
     </div>
   </section>
 
+  <!-- ===== 恋爱协议 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 05</span>
+      <h2>恋爱协议：<em>LOVE_AGREEMENT.md</em></h2>
+    </div>
+    <p class="sec-sub">以下条款一经签署立即生效，<b>不可撤销</b>，不提供卸载入口。</p>
+    <div class="agree-block">
+      <div class="agree-row"><span class="agree-no">0x01</span><span>每天睡前报平安，先回消息，再睡觉。</span></div>
+      <div class="agree-row"><span class="agree-no">0x02</span><span>生气不过夜，优先解决问题，而不是输赢。</span></div>
+      <div class="agree-row"><span class="agree-no">0x03</span><span>你说的话永远是最新分支，我负责 merge 成"我们的"。</span></div>
+      <div class="agree-row"><span class="agree-no">0x04</span><span>你的心情是最高优先级任务，永不进入待办。</span></div>
+      <div class="agree-row"><span class="agree-no">0x05</span><span>所有承诺自动续期，默认终身，无取消订阅。</span></div>
+      <div class="agree-row"><span class="agree-no">0x06</span><span>你永远在我心里，该地址不随迁。</span></div>
+      <p class="agree-sign mono">甲方：我　·　乙方：ok姐　·　状态：<span id="agreeStatus">待签署</span></p>
+      <button class="run-btn mono" id="agreeBtn">git commit --signoff · 签署协议</button>
+    </div>
+  </section>
+
+  <!-- ===== git log ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 06</span>
+      <h2>提交记录：<em>git log</em></h2>
+    </div>
+    <p class="sec-sub">这个仓库只有一条分支：<b>forever</b>。历史不可变，未来一直在提交。</p>
+    <div class="gitlog mono">
+      <p><span class="g-node">*</span><span class="g-hash">c0ffee</span><span class="g-date">(HEAD → forever)</span> feat: init love —— 遇见 ok姐</p>
+      <p><span class="g-node">*</span><span class="g-hash">deadbe</span><span class="g-date">2026-09-05</span> feat: 想念每日自动 +1，无需手动</p>
+      <p><span class="g-node">*</span><span class="g-hash">bada55</span><span class="g-date">2026-09-05</span> fix: 心跳程序无法停止 —— 不修了</p>
+      <p><span class="g-node">*</span><span class="g-hash">10ve0k</span><span class="g-date">2026-09-02</span> feat: 一生一世 lock 永久持有</p>
+      <p class="gitlog-foot">// 无未提交更改 · working tree clean · 已爱你 100%</p>
+    </div>
+  </section>
+
+  <!-- ===== 每日情话 + 倒计时 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 07</span>
+      <h2>每日推送：<em>love.daily()</em></h2>
+    </div>
+    <p class="sec-sub">每天自动编译一条，<b>无副作用</b>（除了心跳加速）。彩蛋：在键盘上敲出 <b>iloveyou</b>。</p>
+    <div class="daily-block">
+      <p class="daily-line mono" id="dailyLine">// 正在编译今日情话……</p>
+      <p class="daily-meta mono"><span>love.daily() → <b id="dailyDate"></b></span><span>距下一次纪念日还有 <b id="countdownDays">-</b> 天</span></p>
+    </div>
+  </section>
+
   <!-- ===== 结尾 ===== -->
   <section class="finale">
     <p class="f-code mono">> npm run forever -- --with ok姐  <span class="c-dim">// 已运行，无终止计划</span></p>
@@ -309,6 +378,7 @@ var HER = "ok姐";   /* 她的名字：页面里所有称呼都由这里生成 *
 var rain = document.getElementById("rain");
 var rctx = rain.getContext("2d");
 var RW=0, RH=0, RDPR=1, rParts=[], rT=0;
+var rainOn = false, loveRain = [], rainTimer = null;   /* 键盘彩蛋：爱心雨 */
 function rainResize(){
   RDPR = Math.min(window.devicePixelRatio||1, 2);
   RW = window.innerWidth; RH = window.innerHeight;
@@ -339,6 +409,23 @@ function rainLoop(){
     rctx.fill();
   }
   rctx.globalAlpha = 1;
+  /* 键盘彩蛋：iloveyou → 全屏爱心雨 */
+  if(rainOn){
+    if(loveRain.length < 70 && Math.random() < .85){
+      loveRain.push({ x:Math.random()*RW, y:-20, s:11+Math.random()*15, v:1.2+Math.random()*2.2, a:.45+Math.random()*.5, pink:Math.random()<.5 });
+    }
+    rctx.font = "16px 'Segoe UI Symbol','Segoe UI',sans-serif";
+    for(var j=loveRain.length-1;j>=0;j--){
+      var lp = loveRain[j];
+      lp.y += lp.v;
+      lp.x += Math.sin(rT*2 + lp.y*.02)*.6;
+      if(lp.y > RH+30){ loveRain.splice(j,1); continue; }
+      rctx.globalAlpha = lp.a;
+      rctx.fillStyle = lp.pink ? "#FF5C8A" : "#5CFF9C";
+      rctx.fillText("♥", lp.x, lp.y);
+    }
+    rctx.globalAlpha = 1;
+  }
 }
 window.addEventListener("resize", rainResize);
 rainResize();
@@ -474,6 +561,60 @@ document.getElementById("decodeBtn").addEventListener("click", function(){
   var btn = document.getElementById("decodeBtn");
   btn.textContent = "// 解码完成，输出：iloveyou";
   btn.classList.add("done");
+});
+
+/* ===================== 恋爱协议：签署 ===================== */
+var agreeBtn = document.getElementById("agreeBtn");
+var agreeStatus = document.getElementById("agreeStatus");
+var agreed = false;
+agreeBtn.addEventListener("click", function(){
+  if(agreed) return;
+  agreed = true;
+  agreeStatus.innerHTML = '<span class="c-ok">已签署 · effective forever</span>';
+  agreeBtn.textContent = "✓ 协议已生效 —— 不可撤销";
+  agreeBtn.classList.add("done");
+});
+
+/* ===================== 每日情话 + 倒计时 ===================== */
+var DAILY = [
+  "if (想你的次数 > 0) { 我 = 正在想你 }",
+  "你的名字，是我代码里唯一的全局变量。",
+  "系统提示：今天也要比昨天更喜欢 ok姐。",
+  "遇到你之后，所有 bug 都变成了 feature。",
+  "正在调用 love(ok姐)，参数永远有效。",
+  "今天的心跳日志：每分钟 100 次，原因只有一个。",
+  "debug 了一整天，发现 bug 是：太想你了。",
+  "我爱你 —— 这条语句没有分号，但永远不会报错。",
+  "如果爱有版本号，我们一定是 v∞.0.0。",
+  "编译通过：余生依赖 ok姐，已锁定版本。"
+];
+var dailyLine = document.getElementById("dailyLine");
+var dailyDate = document.getElementById("dailyDate");
+var countdownDays = document.getElementById("countdownDays");
+function updateDaily(){
+  var now = new Date();
+  dailyDate.textContent = now.getFullYear() + "-" + ("0"+(now.getMonth()+1)).slice(-2) + "-" + ("0"+now.getDate()).slice(-2);
+  var idx = (now.getFullYear()*366 + now.getMonth()*31 + now.getDate()) % DAILY.length;
+  dailyLine.textContent = "love.daily() → " + DAILY[idx];
+  var next = new Date(now.getFullYear(), now.getMonth(), 2);
+  if(now.getDate() > 2) next = new Date(now.getFullYear(), now.getMonth()+1, 2);
+  var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var diff = Math.ceil((next - today0)/86400000);
+  countdownDays.textContent = diff;
+}
+updateDaily();
+setInterval(updateDaily, 30000);
+
+/* ===================== 键盘彩蛋：iloveyou ===================== */
+var keySeq = "", KEY_TARGET = "iloveyou";
+document.addEventListener("keydown", function(e){
+  if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+  keySeq = (keySeq + e.key.toLowerCase()).slice(-KEY_TARGET.length);
+  if(keySeq === KEY_TARGET){
+    rainOn = true;
+    clearTimeout(rainTimer);
+    rainTimer = setTimeout(function(){ rainOn = false; }, 5000);
+  }
 });
 
 /* ===================== 交互终端：真命令 ===================== */
