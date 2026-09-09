@@ -351,7 +351,7 @@ love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
     <p class="sec-sub">每天自动编译一条，<b>无副作用</b>（除了心跳加速）。彩蛋：在键盘上敲出 <b>iloveyou</b>。</p>
     <div class="daily-block">
       <p class="daily-line mono" id="dailyLine">// 正在编译今日情话……</p>
-      <p class="daily-meta mono"><span>love.daily() → <b id="dailyDate"></b></span><span>距下一次纪念日还有 <b id="countdownDays">-</b> 天</span></p>
+      <p class="daily-meta mono"><span>love.daily() → <b id="dailyDate"></b></span><span>认识 ok姐：2026-05-02 22:38 · 已 <b id="knowDays">-</b></span><span>距下一次纪念日还有 <b id="countdownDays">-</b> 天</span></p>
     </div>
   </section>
 
@@ -360,6 +360,7 @@ love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
     <p class="f-code mono">> npm run forever -- --with ok姐  <span class="c-dim">// 已运行，无终止计划</span></p>
     <p class="f-big">love.ok姐()</p>
     <p class="f-line mono">已运行 <span id="sinceDays">0</span> 天 · 仍无终止计划<span class="blink">_</span></p>
+    <p class="f-line mono" style="margin-top:8px;opacity:.75">认识 ok姐：2026-05-02 22:38 · 已 <span id="knowDays2">0</span> · 从那晚起，世界开始编译<span class="blink">_</span></p>
   </section>
 
   <footer>this page is powered by love · no bug found (except missing you)</footer>
@@ -369,9 +370,11 @@ love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
 "use strict";
 /* ===================== 可自定义 =====================
  * 纪念日改成哪一天，结尾就自动显示"已运行第几天"。
- * 当前设为 2026-09-02，今天（09-05）显示第 4 天。
+ * 当前设为 2026-09-02，今天（09-10）显示第 9 天。
+ * 认识时间 2026-05-08：显示"认识 ok姐 已 X 天"。
  */
 var LOVE_START = "2026-09-02";
+var KNOW_START = "2026-05-02T22:38:00";   /* 认识她的那一刻：2026.5.02 晚上 22:38 */
 var HER = "ok姐";   /* 她的名字：页面里所有称呼都由这里生成 */
 
 /* ===================== 背景：漂浮光点粒子 ===================== */
@@ -785,13 +788,27 @@ function sinceDays(){
   if(!isFinite(days) || days < 1) days = 1;
   return days;
 }
+function sinceKnow(){
+  var start = new Date(KNOW_START);
+  var now = new Date();
+  var ms = now - start;
+  if(!isFinite(ms) || ms < 0) ms = 0;
+  var totalMin = Math.floor(ms/60000);
+  return { d: Math.floor(totalMin/1440), h: Math.floor((totalMin%1440)/60), m: totalMin%60 };
+}
 /* 页面开着跨过午夜也自动 +1，无需刷新 */
-var lastDaysShown = -1;
+var lastDaysShown = -1, lastKnowShown = -1;
 function updateDays(){
-  var d = sinceDays();
+  var d = sinceDays(), k = sinceKnow();
   if(d !== lastDaysShown){
     lastDaysShown = d;
     document.getElementById("sinceDays").textContent = d;
+  }
+  var kt = k.d + " 天 " + k.h + " 时 " + k.m + " 分";
+  if(kt !== lastKnowShown){
+    lastKnowShown = kt;
+    var e1 = document.getElementById("knowDays"); if(e1) e1.textContent = kt;
+    var e2 = document.getElementById("knowDays2"); if(e2) e2.textContent = kt;
   }
 }
 updateDays();
