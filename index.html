@@ -136,6 +136,12 @@
   .daily-meta{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:12px;color:var(--gray);flex-wrap:wrap}
   .daily-meta b{color:var(--green);font-weight:500}
 
+  .visit-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .visit-stats{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--gray)}
+  .visit-stats b{color:var(--green);font-weight:500}
+  .visit-list{margin-top:12px;font-size:12px;color:var(--gray);line-height:2;word-break:break-all}
+  .visit-list b{color:var(--pink);font-weight:500}
+
   /* ===== 代码块 ===== */
   .code-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px;overflow-x:auto}
   .code-block pre{font-family:"Fira Code",Consolas,monospace;font-size:14px;line-height:1.95;color:var(--white)}
@@ -355,6 +361,18 @@ love(me, you);  <span class="tk-c">// 调用一次，运行一生</span></pre>
     </div>
   </section>
 
+  <!-- ===== 访问日志 ===== -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="line-num mono">// 08</span>
+      <h2>访问日志：<em>visit.log()</em></h2>
+    </div>
+    <p class="sec-sub">谁来过、来过几次、什么时候——都记在这里。<b>隐私说明</b>：只记访问次数与本地时间，不收集任何个人信息。</p>
+    <div class="visit-block">
+      <p class="visit-stats mono"><span>全站访问 <b id="visitPv">-</b> 次</span><span>访客 <b id="visitUv">-</b> 人</span><span>本机打开 <b id="visitLocal">-</b> 次</span></p>
+      <p class="visit-list mono" id="visitList">// 正在读取本地访问记录……</p>
+    </div>
+  </section>
   <!-- ===== 结尾 ===== -->
   <section class="finale">
     <p class="f-code mono">> npm run forever -- --with ok姐  <span class="c-dim">// 已运行，无终止计划</span></p>
@@ -814,8 +832,56 @@ function updateDays(){
 updateDays();
 setInterval(updateDays, 30000);
 
+/* ===================== 访问日志 visit.log() ===================== */
+(function(){
+  var LS_KEY = "love_okjie_visit_log_v1";
+  var list = [];
+  try {
+    list = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    if(!Array.isArray(list)) list = [];
+  } catch(e){ list = []; }
+  list.push({ t: new Date().toISOString() });
+  if(list.length > 30) list = list.slice(-30);
+  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch(e){}
+
+  var pad = function(n){ return (n < 10 ? "0" : "") + n; };
+  function fmt(iso){
+    var d = new Date(iso);
+    return (d.getMonth()+1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  var locEl = document.getElementById("visitLocal");
+  if(locEl) locEl.textContent = list.length;
+  var lstEl = document.getElementById("visitList");
+  if(lstEl){
+    var recent = list.slice(-5).reverse();
+    if(recent.length){
+      var items = [];
+      for(var i=0;i<recent.length;i++){
+        items.push("[" + fmt(recent[i].t) + "] 第 <b>" + (list.length - i) + "</b> 次");
+      }
+      lstEl.innerHTML = "// 最近访问（本机）：" + items.join("　");
+    } else {
+      lstEl.textContent = "// 暂无记录";
+    }
+  }
+  /* 全站 PV/UV：不蒜子统计（服务端聚合，跨设备累计；取不到则显示 -） */
+  var pvEl = document.getElementById("visitPv"), uvEl = document.getElementById("visitUv");
+  var tries = 0;
+  var timer = setInterval(function(){
+    tries++;
+    if((window.busuanzi && busuanzi.site_pv) || tries > 24){
+      clearInterval(timer);
+      if(window.busuanzi){
+        if(pvEl) pvEl.textContent = busuanzi.site_pv || "-";
+        if(uvEl) uvEl.textContent = busuanzi.site_uv || "-";
+      }
+    }
+  }, 500);
+})();
+
 /* ===================== 启动 ===================== */
 setTimeout(playTerm, 400);
 </script>
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>
